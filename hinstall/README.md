@@ -1,5 +1,5 @@
 # <img src="https://static.sidefx.com/images/apple-touch-icon.png"  width="25" height="25" alt=""> Hbuild
-[![Hbuild GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?style=flat-square&logo=github)](https://github.com/aaronsmithtv/hbuild)
+[![Hbuild GitHub Repository](https://img.shields.io/badge/GitHub-Houdini--Docker-f06c00?style=flat-square&logo=github)](https://github.com/aaronsmithtv/houdini-docker)
  ![Docker Pulls](https://img.shields.io/docker/pulls/aaronsmithtv/hbuild)
 
 Hbuild is the repository Houdini-Docker generated images. The images are based on `debian:11-slim`. Hbuild provides a complete, lightweight installation of [*Houdini*](https://www.sidefx.com/products/houdini/), a powerful 3D software by SideFX; You can use this image to run Houdini in a containerized environment, making it easy to set up and manage across various platforms and systems, and at a compressed size of ~2.09GB, it is significantly more portable than the average Houdini installation image of ~6.7GB. 

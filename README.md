@@ -1,5 +1,5 @@
 # <img src="https://static.sidefx.com/images/apple-touch-icon.png" width="25" height="25" alt="Hbuild Logo"> Houdini-Docker
-[![Aaron Smith's Personal Website](https://img.shields.io/badge/aaronsmith-.tv-blue?style=flat-square)](https://aaronsmith.tv)
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-Hbuild-f06c00?logo=docker)](https://hub.docker.com/r/aaronsmithtv/hbuild)
 ![Docker Pulls](https://img.shields.io/docker/pulls/aaronsmithtv/hbuild)
 
 ## Houdini Production Build Docker Image
