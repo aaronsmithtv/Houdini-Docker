@@ -14,7 +14,7 @@ Hbuild is the repository Houdini-Docker generated images. The images are based o
 
 ## Image Tags
 
-- `aaronsmithtv/hbuild:19.5.568-base-0.1`
+- `aaronsmithtv/hbuild:19.5.*-base`
 - `aaronsmithtv/hbuild:latest`
 
 ## Usage
@@ -57,4 +57,4 @@ This Docker image is provided as-is and is not officially supported by SideFX. I
 Contributions to this project are welcome! Please feel free to submit a pull request or open an issue on the [Houdini-Docker GitHub repository](https://github.com/aaronsmithtv/houdini-docker).
 
 ## SideFX EULA
-This Docker image is built and distributed with and under the terms of the specified Houdini [*End User License Agreement (EULA)*](https://www.sidefx.com/legal/license-agreement/) date (as of October 13, 2021). You must be aware of the EULA terms and conditions when using this image. By using this image, you agree to abide by the terms and conditions of the Houdini EULA.
+All Hbuild Docker images are built and distributed with and under the terms of the specified Houdini [*End User License Agreement (EULA)*](https://www.sidefx.com/legal/license-agreement/) date (as of October 13, 2021). You must be aware of the EULA terms and conditions when using this image. By using this image, you agree to abide by the terms and conditions of the Houdini EULA.
