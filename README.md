@@ -1,10 +1,13 @@
 # <img src="https://static.sidefx.com/images/apple-touch-icon.png" width="25" height="25" alt="Hbuild Logo"> Houdini-Docker
+![Autobuild](https://github.com/aaronsmithtv/houdini-docker/actions/workflows/houdocker_autobuild.yml/badge.svg)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-Hbuild-f06c00?logo=docker)](https://hub.docker.com/r/aaronsmithtv/hbuild)
 ![Docker Pulls](https://img.shields.io/docker/pulls/aaronsmithtv/hbuild)
 
 ## Houdini Production Build Docker Image
 
 Houdini-Docker is a project that automatically builds and pushes Docker images for the latest production build of SideFX Houdini. This project ensures you always have an up-to-date Docker image for Houdini, making it easier to create and deploy containerized environments for your 3D graphics projects.
+
+*Note: All Hbuild images are currently build with linux_x86_64 production builds. To build an image with an alternative instruction set, see the [hinstall README](hinstall/README.md).*
 
 ---
 

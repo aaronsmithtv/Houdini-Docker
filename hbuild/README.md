@@ -29,6 +29,7 @@ To use this script, you'll need:
    - `SIDEFX_SECRET`: Your SideFX API Client Secret.
    - `DOCKER_USER`: Your Docker Hub username.
    - `DOCKER_SECRET`: Your Docker Hub access token or password.
+   - `DOCKER_REPO`: The name of the repository/image to push to. For example, `hbuild`.
 
 3. The GitHub Actions workflow will now run daily at midnight, building and pushing the latest Houdini Docker image to your Docker Hub account.
 
