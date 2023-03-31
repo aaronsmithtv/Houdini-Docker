@@ -1,7 +1,5 @@
-import pytest
 import unittest
 from unittest.mock import MagicMock
-import docker
 from docker.errors import NotFound
 import hbuild.autobuild as autobuild
 import hbuild.sidefxapi.sidefx as sidefx
@@ -22,7 +20,7 @@ def test_image_tag_exists():
     docker_client.reset_mock()
 
     # Scenario 2: Image tag does not exist
-    docker_client.images.pull.side_effect = docker.errors.NotFound("Not found")
+    docker_client.images.pull.side_effect = NotFound("Not found")
     result = autobuild.image_tag_exists(docker_client, tag, repo)
     assert result is True
     docker_client.images.pull.assert_called_once_with(repository=repo, tag=tag)
@@ -32,11 +30,9 @@ def test_get_latest_build():
     # Create a mock SideFX API service
     mock_service = MagicMock(spec=sidefx._Service)
 
-    # Create a mock download object and set it as the 'download' attribute of the mock_service
     mock_download = MagicMock()
     mock_service.download = mock_download
 
-    # Mock the responses for get_daily_builds_list and get_daily_build_download methods
     mock_download.get_daily_builds_list.return_value = [
         {
             'product': 'houdini',
@@ -53,7 +49,8 @@ def test_get_latest_build():
     }
 
     # Mock the sidefx.service() call to return the mock_service
-    with unittest.mock.patch.object(sidefx, 'service', return_value=mock_service):
+    with unittest.mock.patch.object(
+            sidefx, 'service', return_value=mock_service):
         latest_build = autobuild.get_latest_build()
 
     # Verify the results

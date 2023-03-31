@@ -35,12 +35,12 @@ def image_tag_exists(docker_client: docker.DockerClient, tag: str, repo: str) ->
 	if server_image:
 		logging.info(f"Upload not needed, image tag `{tag}` already exists")
 		return False
-	logging.info(f"Tag does not exist in repository, beginning download/push process...")
+	logging.info("Tag does not exist in repository, beginning download/push process...")
 	return True
 
 
 def get_latest_build() -> dict:
-	logging.info(f"Starting Houdini download client service")
+	logging.info("Starting Houdini download client service")
 	# Set up the SideFX API service
 	service = sidefx.service(
 		access_token_url="https://www.sidefx.com/oauth2/application_token",
@@ -123,4 +123,4 @@ if __name__ == "__main__":
 	else:
 		wfutils.actions_write_output(name="test_status", value="skip")
 
-	logging.info(f"Finished HouDocker process, exiting...")
+	logging.info("Finished HouDocker process, exiting...")
