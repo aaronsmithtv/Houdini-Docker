@@ -6,6 +6,7 @@ import logging
 
 import hbuild.sidefxapi.sidefx as sidefx
 import hbuild.util.logutils as logutils
+import hbuild.util.workflowutils as wfutils
 
 
 logging.basicConfig(level=logging.INFO)
@@ -16,12 +17,13 @@ dl_platform = 'linux'
 
 DOCKER_USER = os.environ.get('DOCKER_USER')
 DOCKER_SECRET = os.environ.get('DOCKER_SECRET')
+DOCKER_REPO = os.environ.get('DOCKER_REPO')
 
 SIDEFX_CLIENT = os.environ.get('SIDEFX_CLIENT')
 SIDEFX_SECRET = os.environ.get('SIDEFX_SECRET')
 
 install_dir = "../hinstall"
-build_repo = f"{DOCKER_USER}/hbuild"
+build_repo = f"{DOCKER_USER}/{DOCKER_REPO}"
 
 
 def image_tag_exists(docker_client: docker.DockerClient, tag: str, repo: str) -> bool:
@@ -33,12 +35,12 @@ def image_tag_exists(docker_client: docker.DockerClient, tag: str, repo: str) ->
 	if server_image:
 		logging.info(f"Upload not needed, image tag `{tag}` already exists")
 		return False
-	logging.info(f"Tag does not exist in repository, beginning download/push process...")
+	logging.info("Tag does not exist in repository, beginning download/push process...")
 	return True
 
 
 def get_latest_build() -> dict:
-	logging.info(f"Starting Houdini download client service")
+	logging.info("Starting Houdini download client service")
 	# Set up the SideFX API service
 	service = sidefx.service(
 		access_token_url="https://www.sidefx.com/oauth2/application_token",
@@ -117,5 +119,8 @@ if __name__ == "__main__":
 		for line in client.images.push(repository=build_repo, tag='latest', stream=True):
 			logutils.process_docker_message(line)
 		logging.info(f"Successfully pushed Docker image `latest` in `{build_repo}`.")
+		wfutils.actions_write_output(name="test_status", value="cont")
+	else:
+		wfutils.actions_write_output(name="test_status", value="skip")
 
-	logging.info(f"Finished HouDocker process, exiting...")
+	logging.info("Finished HouDocker process, exiting...")

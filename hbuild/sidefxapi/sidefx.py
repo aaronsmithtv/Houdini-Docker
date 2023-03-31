@@ -47,7 +47,8 @@ class _APIFunction:
 
 
 def get_access_token_and_expiry_time(
-        access_token_url: str, client_id: str, client_secret_key: str, timeout: Optional[int] = None):
+        access_token_url: str, client_id: str,
+        client_secret_key: str, timeout: Optional[int] = None):
     """Given an API client (id and secret key) that is allowed to make API
     calls, return an access token that can be used to make calls.
     """
