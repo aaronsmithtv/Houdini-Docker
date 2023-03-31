@@ -7,7 +7,7 @@
 
 Houdini-Docker is a project that automatically builds and pushes Docker images for the latest production build of SideFX Houdini. This project ensures you always have an up-to-date Docker image for Houdini, making it easier to create and deploy containerized environments for your 3D graphics projects.
 
-*Note: All Hbuild images are currently build with linux_x86_64 production builds. To build an image with an alternative instruction set, see the [hinstall README](hinstall/README.md).*
+*Note: All Hbuild images are currently built with linux_x86_64 production builds. To build an image with an alternate instruction set, see the [hinstall README](hinstall/README.md).*
 
 ---
 
