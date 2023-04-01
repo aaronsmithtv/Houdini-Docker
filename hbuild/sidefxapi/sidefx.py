@@ -3,6 +3,7 @@ import json
 import base64
 import io
 import html
+import logging
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -12,7 +13,7 @@ from typing import Optional, Any
 
 # from hinstall.model.service import ApiService
 from hbuild.sidefxapi.exception import APIError, AuthorizationError
-from hbuild.sidefxapi.fileutils import File, ResponseFile
+from hbuild.sidefxapi.model.file import File, ResponseFile
 
 
 class _Service:
@@ -32,6 +33,7 @@ class _APIFunction:
     def __init__(self, function_name: str, apiservice: _Service):
         self.function_name = function_name
         self.service = apiservice
+        logging.info(f"Function: `{self.function_name}`, Service: `{self.service}`")
 
     def __getattr__(self, attr_name):
         # This isn't actually an API function, but a family of them.  Append
@@ -49,7 +51,8 @@ class _APIFunction:
 def get_access_token_and_expiry_time(
         access_token_url: str, client_id: str,
         client_secret_key: str, timeout: Optional[int] = None):
-    """Given an API client (id and secret key) that is allowed to make API
+    """
+    Given an API client (id and secret key) that is allowed to make API
     calls, return an access token that can be used to make calls.
     """
     # If they're trying to use the /token URL directly then assume this is a
@@ -84,9 +87,11 @@ def get_access_token_and_expiry_time(
 def call_api_with_access_token(
         endpoint_url: str, access_token: str, function_name: str,
         args: Any, kwargs: Any, timeout: Optional[int] = None):
-    """Call into the API using an access token that was returned by
+    """
+    Call into the API using an access token that was returned by
     get_access_token.
     """
+    logging.info(f"kwargs items: {kwargs.items()}")
     file_data = {}
     for arg_name, arg_value in kwargs.items():
         if isinstance(arg_value, (bytearray, File)):
@@ -102,6 +107,7 @@ def call_api_with_access_token(
         del kwargs[arg_name]
 
     post_data = dict(json=json.dumps([function_name, args, kwargs]))
+    logging.info(f"Post data: `{post_data}`")
 
     retry_strategy = Retry(
         total=3,
@@ -113,7 +119,7 @@ def call_api_with_access_token(
     http = requests.Session()
     http.mount("https://", adapter)
     http.mount("http://", adapter)
-
+    logging.info(f"file data: `{file_data}`")
     response = http.post(
         endpoint_url,
         headers={"Authorization": "Bearer " + access_token},

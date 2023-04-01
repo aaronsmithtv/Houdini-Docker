@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, AnyUrl, validator
 from datetime import datetime
 from enum import Enum
+from typing import Optional
 import re
 
 
@@ -53,14 +54,20 @@ class ApiService(BaseModel):
     endpoint_url: AnyUrl = Field(..., description="The base URL for the API endpoint")
 
 
-class DailyBuild(BaseModel):
-    build: str
-    date: DateModel
-    platform: PlatformModel
+class ProductModel(BaseModel):
     product: str
+    platform: str
+
+
+class ProductBuild(ProductModel):
+    version: Optional[str]
+    build: Optional[str]
+
+
+class DailyBuild(ProductBuild):
+    date: str
     release: str
     status: str
-    version: str
 
     class Config:
         schema_extra = {
@@ -76,13 +83,16 @@ class DailyBuild(BaseModel):
         }
 
 
-class DownloadBuild(BaseModel):
-    date: DateModel
+class InstallBuild(BaseModel):
     download_url: AnyUrl
     filename: str
     hash: HashModel
-    releases_list: str
-    status: str
+
+
+class BuildDownloadModel(InstallBuild):
+    date: Optional[str]
+    releases_list: Optional[str]
+    status: Optional[str]
     size: int
 
     class Config:
@@ -97,9 +107,3 @@ class DownloadBuild(BaseModel):
                 "size": 1114902200,
             }
         }
-
-
-class InstallBuild(BaseModel):
-    download_url: AnyUrl
-    filename: str
-    hash: HashModel
