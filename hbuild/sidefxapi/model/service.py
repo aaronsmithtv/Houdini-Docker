@@ -1,6 +1,17 @@
 from pydantic import BaseModel, Field, AnyUrl, validator
 from datetime import datetime
 from enum import Enum
+import re
+
+
+class HashModel(BaseModel):
+    hash: str
+
+    @validator('hash')
+    def validate_md5_hash(cls, hash_str):
+        if re.match(r"^[a-fA-F0-9]{32}$", hash_str):
+            return hash_str
+        raise ValueError("Invalid MD5 hash format")
 
 
 class Platform(Enum):
@@ -43,8 +54,8 @@ class ApiService(BaseModel):
 
 
 class DailyBuild(BaseModel):
-    build: DateModel
-    date: str
+    build: str
+    date: DateModel
     platform: PlatformModel
     product: str
     release: str
@@ -69,7 +80,7 @@ class DownloadBuild(BaseModel):
     date: DateModel
     download_url: AnyUrl
     filename: str
-    hash: str
+    hash: HashModel
     releases_list: str
     status: str
     size: int
@@ -91,4 +102,4 @@ class DownloadBuild(BaseModel):
 class InstallBuild(BaseModel):
     download_url: AnyUrl
     filename: str
-    hash: str
+    hash: HashModel
