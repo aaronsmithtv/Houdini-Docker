@@ -4,7 +4,6 @@ from docker.errors import NotFound
 import os
 import logging
 
-import hbuild.sidefxapi.sidefx as sidefx
 import hbuild.util.logutils as logutils
 import hbuild.util.workflowutils as wfutils
 
@@ -44,13 +43,6 @@ def image_tag_exists(docker_client: docker.DockerClient, tag: str, repo: str) ->
 
 def get_latest_build() -> dict:
 	logging.info("Starting Houdini download client service")
-	# Set up the SideFX API service
-	# service = sidefx.service(
-	# 	access_token_url="https://www.sidefx.com/oauth2/application_token",
-	# 	client_id=SIDEFX_CLIENT,
-	# 	client_secret_key=SIDEFX_SECRET,
-	# 	endpoint_url="https://www.sidefx.com/api/",
-	# )
 
 	sidefx_client = webapi.WebHoudini(
 		sesi_secret=SIDEFX_SECRET,
@@ -64,41 +56,14 @@ def get_latest_build() -> dict:
 
 	latest_build = sidefx_client.get_latest_builds(build=product_build)[0]
 
-	latest_build = ProductBuild(
-		product=latest_build['product'],
-		version=latest_build['version'],
-		build=latest_build['build'],
-		platform=dl_platform,
-	)
-
 	build_dl = sidefx_client.get_build_download(
 		build=latest_build
 	)
-	# # Retrieve the daily builds list for the specified product, version, and platform
-	# latest_build = service.download.get_daily_builds_list(
-	# 	product=dl_product,
-	# 	platform=dl_platform,
-	# 	only_production=True)[0]
-	#
-	# # Retrieve the latest daily build available
-	# srv_build = service.download.get_daily_build_download(
-	# 	product=latest_build['product'],
-	# 	version=latest_build['version'],
-	# 	build=latest_build['build'],
-	# 	platform=dl_platform)
-	#
-	# build = {
-	# 	'download_url': srv_build['download_url'],
-	# 	'filename': srv_build['filename'],
-	# 	'hash': srv_build['hash'],
-	# 	'version': latest_build['version'],
-	# 	'build': latest_build['build'],
-	# }
 
 	build = {
-		'download_url': build_dl['download_url'],
-		'filename': build_dl['filename'],
-		'hash': build_dl['hash'],
+		'download_url': build_dl.download_url,
+		'filename': build_dl.filename,
+		'hash': build_dl.hash,
 		'version': latest_build.version,
 		'build': latest_build.build,
 	}

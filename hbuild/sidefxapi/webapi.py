@@ -11,7 +11,7 @@ from typing import Optional, Any
 
 # from hinstall.model.service import ApiService
 from hbuild.sidefxapi.model.file import ResponseFile
-from hbuild.sidefxapi.model.service import ProductBuild, ProductModel
+from hbuild.sidefxapi.model.service import ProductBuild, ProductModel, BuildDownloadModel
 from hbuild.sidefxapi.exception import APIError, AuthorizationError
 
 
@@ -26,25 +26,27 @@ class WebHoudini:
 
 	def get_latest_builds(
 			self, build: ProductModel,
-			only_production: Optional[bool] = True) -> list:
+			only_production: Optional[bool] = True) -> list[ProductBuild]:
 		api_command = "download.get_daily_builds_list"
 
 		build = dict(build)
 		build.update({'only_production': only_production})
 
 		post_data = dict(json=json.dumps([api_command, [], build]))
-		response = self.get_session_response(post_data)
+		resp_builds = self.get_session_response(post_data)
 
-		return response
+		builds = [ProductBuild.parse_obj(resp_build) for resp_build in resp_builds]
 
-	def get_build_download(self, build: ProductBuild):
+		return builds
+
+	def get_build_download(self, build: ProductBuild) -> BuildDownloadModel:
 		api_command = "download.get_daily_build_download"
 
 		build = dict(build)
 		post_data = dict(json=json.dumps([api_command, [], build]))
-		response = self.get_session_response(post_data)
+		resp_build = self.get_session_response(post_data)
 
-		return response
+		return BuildDownloadModel.parse_obj(resp_build)
 
 	def get_session_response(
 			self, post_data: dict[str, Any],

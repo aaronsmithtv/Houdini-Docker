@@ -1,57 +1,5 @@
-from pydantic import BaseModel, Field, AnyUrl, validator
-from datetime import datetime
-from enum import Enum
+from pydantic import BaseModel, AnyUrl
 from typing import Optional
-import re
-
-
-class HashModel(BaseModel):
-    hash: str
-
-    @validator('hash')
-    def validate_md5_hash(cls, hash_str):
-        if re.match(r"^[a-fA-F0-9]{32}$", hash_str):
-            return hash_str
-        raise ValueError("Invalid MD5 hash format")
-
-
-class Platform(Enum):
-    WINDOWS = "win64"
-    MACOS = "macos"
-    MACOS_ARM = "macosx_arm64"
-    LINUX = "linux"
-
-
-class PlatformModel(BaseModel):
-    platform: str
-
-    @validator('platform')
-    def validate_platform(cls, platform_str):
-        for plat in Platform:
-            if platform_str.startswith(plat.value):
-                return platform_str
-        raise ValueError(
-            "Platform should start with: " + ', '.join(
-                [p.value for p in Platform]))
-
-
-class DateModel(BaseModel):
-    date: str
-
-    @validator('date')
-    def validate_date_format(cls, date_str):
-        try:
-            datetime.strptime(date_str, '%Y/%m/%d')
-            return date_str
-        except ValueError:
-            raise ValueError("Incorrect date format, should be 'YYYY/MM/DD'")
-
-
-class ApiService(BaseModel):
-    client_id: str = Field(..., description="SideFX Application Client ID")
-    client_secret: str = Field(..., description="SideFX Application Client Secret")
-    access_token_url: AnyUrl = Field(..., description="The URL for retrieving the access token")
-    endpoint_url: AnyUrl = Field(..., description="The base URL for the API endpoint")
 
 
 class ProductModel(BaseModel):
@@ -86,7 +34,7 @@ class DailyBuild(ProductBuild):
 class InstallBuild(BaseModel):
     download_url: AnyUrl
     filename: str
-    hash: HashModel
+    hash: str
 
 
 class BuildDownloadModel(InstallBuild):
