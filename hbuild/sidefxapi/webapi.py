@@ -11,7 +11,7 @@ from typing import Optional, Any
 
 # from hinstall.model.service import ApiService
 from hbuild.sidefxapi.model.file import ResponseFile
-from hbuild.sidefxapi.model.service import ProductBuild, ProductModel, BuildDownloadModel
+from hbuild.sidefxapi.model.service import ProductBuild, ProductModel, BuildDownloadModel, DailyBuild
 from hbuild.sidefxapi.exception import APIError, AuthorizationError
 
 
@@ -19,14 +19,16 @@ class WebHoudini:
 	def __init__(self, sesi_secret: str, sesi_id: str):
 		self.session = get_session()
 		self.endpoint_url = "https://www.sidefx.com/api/"
+		self.access_token_url = "https://www.sidefx.com/oauth2/application_token"
 		self.access_token, self.expiry_time = get_access_token_and_expiry_time(
+			access_token_url=self.access_token_url,
 			client_secret_key=sesi_secret,
 			client_id=sesi_id
 		)
 
 	def get_latest_builds(
 			self, build: ProductModel,
-			only_production: Optional[bool] = True) -> list[ProductBuild]:
+			only_production: Optional[bool] = True) -> list[DailyBuild]:
 		api_command = "download.get_daily_builds_list"
 
 		build = dict(build)
@@ -35,7 +37,7 @@ class WebHoudini:
 		post_data = dict(json=json.dumps([api_command, [], build]))
 		resp_builds = self.get_session_response(post_data)
 
-		builds = [ProductBuild.parse_obj(resp_build) for resp_build in resp_builds]
+		builds = [DailyBuild.parse_obj(resp_build) for resp_build in resp_builds]
 
 		return builds
 
@@ -84,7 +86,7 @@ def get_session():
 def get_access_token_and_expiry_time(
 		client_id: str,
 		client_secret_key: str,
-		access_token_url: str = "https://www.sidefx.com/oauth2/application_token",
+		access_token_url: str,
 		timeout: Optional[int] = None):
 	"""
 	Given an API client (id and secret key) that is allowed to make API

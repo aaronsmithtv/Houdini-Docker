@@ -8,7 +8,7 @@ import hbuild.util.logutils as logutils
 import hbuild.util.workflowutils as wfutils
 
 import hbuild.sidefxapi.webapi as webapi
-from hbuild.sidefxapi.model.service import ProductModel, ProductBuild, BuildDownloadModel
+from hbuild.sidefxapi.model.service import ProductModel, DailyBuild, ProductBuild
 
 
 logging.basicConfig(level=logging.INFO)
@@ -57,7 +57,7 @@ def get_latest_build() -> dict:
 	latest_build = sidefx_client.get_latest_builds(build=product_build)[0]
 
 	build_dl = sidefx_client.get_build_download(
-		build=latest_build
+		build=ProductBuild(**latest_build.dict())
 	)
 
 	build = {
