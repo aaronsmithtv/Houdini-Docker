@@ -99,15 +99,17 @@ if __name__ == "__main__":
         logging.info(f"Built Docker image `{image.short_id}`, pushing to Docker hub...")
         client.login(username=DOCKER_USER, password=DOCKER_SECRET)
 
-        for line in client.images.push(repository=build_repo, tag=build_tag, stream=True):
+        for line in client.images.push(
+                repository=build_repo, tag=build_tag, stream=True):
             logutils.process_docker_message(line)
-        logging.info(f"Successfully pushed Docker image `{build_tag}` in `{build_repo}`.")
+        logging.info(f"Pushed Docker image `{build_tag}` in `{build_repo}`.")
 
         docker.from_env().images.get(f"{build_repo}:{build_tag}").tag(f"{build_repo}:latest")
 
-        for line in client.images.push(repository=build_repo, tag='latest', stream=True):
+        for line in client.images.push(
+                repository=build_repo, tag='latest', stream=True):
             logutils.process_docker_message(line)
-        logging.info(f"Successfully pushed Docker image `latest` in `{build_repo}`.")
+        logging.info(f"Pushed Docker image `latest` in `{build_repo}`.")
         wfutils.actions_write_output(name="test_status", value="cont")
     else:
         wfutils.actions_write_output(name="test_status", value="skip")
