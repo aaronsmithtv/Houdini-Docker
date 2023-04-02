@@ -7,11 +7,11 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from typing import Optional, Any
+from typing import Optional, Any, AnyStr
 
-# from hinstall.model.service import ApiService
 from hbuild.sidefxapi.model.file import ResponseFile
-from hbuild.sidefxapi.model.service import ProductBuild, ProductModel, BuildDownloadModel, DailyBuild
+from hbuild.sidefxapi.model.service import \
+	ProductBuild, ProductModel, BuildDownloadModel, DailyBuild
 from hbuild.sidefxapi.exception import APIError, AuthorizationError
 
 
@@ -29,12 +29,16 @@ class WebHoudini:
 	def get_latest_builds(
 			self, build: ProductModel,
 			only_production: Optional[bool] = True) -> list[DailyBuild]:
+		"""
+		Get a list of DailyBuild objects that provide specific data about the
+		most recent Houdini product builds
+		"""
 		api_command = "download.get_daily_builds_list"
 
-		build = dict(build)
-		build.update({'only_production': only_production})
+		build_dict = dict(build)
+		build_dict.update({'only_production': only_production})
 
-		post_data = dict(json=json.dumps([api_command, [], build]))
+		post_data = dict(json=json.dumps([api_command, [], build_dict]))
 		resp_builds = self.get_session_response(post_data)
 
 		builds = [DailyBuild.parse_obj(resp_build) for resp_build in resp_builds]
@@ -42,13 +46,16 @@ class WebHoudini:
 		return builds
 
 	def get_build_download(self, build: ProductBuild) -> BuildDownloadModel:
+		"""
+		Using ProductBuild object data, get download info for the build
+		"""
 		api_command = "download.get_daily_build_download"
 
-		build = dict(build)
-		post_data = dict(json=json.dumps([api_command, [], build]))
+		build_dict = dict(build)
+		post_data = dict(json=json.dumps([api_command, [], build_dict]))
 		resp_build = self.get_session_response(post_data)
-
-		return BuildDownloadModel.parse_obj(resp_build)
+		build_dl = BuildDownloadModel.parse_obj(resp_build)
+		return build_dl
 
 	def get_session_response(
 			self, post_data: dict[str, Any],
@@ -69,7 +76,7 @@ class WebHoudini:
 			_extract_traceback_from_response(response))
 
 
-def get_session():
+def get_session() -> requests.Session:
 	retry_strategy = Retry(
 		total=3,
 		status_forcelist=[429, ],
@@ -87,11 +94,12 @@ def get_access_token_and_expiry_time(
 		client_id: str,
 		client_secret_key: str,
 		access_token_url: str,
-		timeout: Optional[int] = None):
+		timeout: Optional[int] = None) -> (AnyStr, AnyStr):
 	"""
 	Given an API client (id and secret key) that is allowed to make API
 	calls, return an access token that can be used to make calls.
 	"""
+
 	# If they're trying to use the /token URL directly then assume this is a
 	# client-credentials application.
 	post_data = {}
@@ -107,7 +115,7 @@ def get_access_token_and_expiry_time(
 		},
 		data=post_data,
 		timeout=timeout)
-	# logging.info(f"Raised response code `{response.status_code}`")
+
 	if response.status_code != 200:
 		raise AuthorizationError(
 			response.status_code,
@@ -120,8 +128,9 @@ def get_access_token_and_expiry_time(
 	return response_json["access_token"], access_token_expiry_time
 
 
-def _extract_traceback_from_response(response: requests.Response):
-	"""Helper function to extract a traceback from the web server response
+def _extract_traceback_from_response(response: requests.Response) -> AnyStr:
+	"""
+	Helper function to extract a traceback from the web server response
 	if an API call generated a server-side exception and the server is running
 	in debug mode.  In production mode, the server will send back just the
 	stack trace without the need to parse any html.
@@ -143,5 +152,8 @@ def _extract_traceback_from_response(response: requests.Response):
 	return html.unescape(traceback)
 
 
-def without_keys(d, keys):
+def without_keys(d: dict, keys: list[str]) -> dict:
+	"""
+	Return a dict without keys specified in list
+	"""
 	return {k: d[k] for k in d.keys() - keys}

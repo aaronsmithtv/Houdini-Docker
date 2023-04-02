@@ -6,6 +6,8 @@ import hashlib
 import logging
 from tqdm import tqdm
 
+logger = logging.getLogger(__name__)
+
 
 def extract_tar_gz_file(file_path: str) -> str:
     """

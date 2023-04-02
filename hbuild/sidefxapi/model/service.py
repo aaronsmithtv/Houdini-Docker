@@ -38,9 +38,9 @@ class InstallBuild(BaseModel):
 
 
 class BuildDownloadModel(InstallBuild):
-    date: Optional[str]
-    releases_list: Optional[str]
-    status: Optional[str]
+    date: str
+    releases_list: str
+    status: str
     size: int
 
     class Config:

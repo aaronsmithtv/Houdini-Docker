@@ -8,7 +8,8 @@ import hbuild.util.logutils as logutils
 import hbuild.util.workflowutils as wfutils
 
 import hbuild.sidefxapi.webapi as webapi
-from hbuild.sidefxapi.model.service import ProductModel, DailyBuild, ProductBuild
+from hbuild.sidefxapi.model.service import \
+	ProductModel, BuildDownloadModel, ProductBuild, DailyBuild
 
 
 logging.basicConfig(level=logging.INFO)
@@ -41,7 +42,7 @@ def image_tag_exists(docker_client: docker.DockerClient, tag: str, repo: str) ->
 	return True
 
 
-def get_latest_build() -> dict:
+def get_latest_build() -> (BuildDownloadModel, DailyBuild):
 	logging.info("Starting Houdini download client service")
 
 	sidefx_client = webapi.WebHoudini(
@@ -54,71 +55,63 @@ def get_latest_build() -> dict:
 		platform=dl_platform
 	)
 
-	latest_build = sidefx_client.get_latest_builds(build=product_build)[0]
+	build_select = sidefx_client.get_latest_builds(build=product_build)[0]
 
 	build_dl = sidefx_client.get_build_download(
-		build=ProductBuild(**latest_build.dict())
+		build=ProductBuild(**build_select.dict())
 	)
 
-	build = {
-		'download_url': build_dl.download_url,
-		'filename': build_dl.filename,
-		'hash': build_dl.hash,
-		'version': latest_build.version,
-		'build': latest_build.build,
-	}
-
-	return build
+	return build_dl, build_select
 
 
 if __name__ == "__main__":
 	client = docker.from_env()
 
-	dl_build = get_latest_build()
+	build_url, build_meta = get_latest_build()
 
-	build_tag = f"{dl_build['version']}.{dl_build['build']}-base"
+	build_tag = f"{build_meta.version}.{build_meta.build}-base"
 	logging.info(f'Latest build found: `{build_tag}`')
 
-	# tag_status = image_tag_exists(
-	# 	docker_client=client,
-	# 	tag=build_tag,
-	# 	repo=build_repo
-	# )
-	#
-	# if tag_status:
-	# 	build_args = {
-	# 		'DL_URL': dl_build['download_url'],
-	# 		'DL_NAME': dl_build['filename'],
-	# 		'DL_HASH': dl_build['hash'],
-	# 		'EULA_DATE': dl_eula_date,
-	# 	}
-	#
-	# 	dockerfile_dir = os.path.join(os.path.dirname(__file__), "..", "hinstall")
-	#
-	# 	logging.info("Building Docker image...")
-	# 	image, logs = client.images.build(
-	# 		path=os.path.abspath(dockerfile_dir),
-	# 		rm=True,
-	# 		nocache=True,
-	# 		tag=f"{build_repo}:{build_tag}",
-	# 		buildargs=build_args,
-	# 		encoding="gzip",
-	# 	)
-	#
-	# 	logging.info(f"Built Docker image `{image.short_id}`, pushing to Docker hub...")
-	# 	client.login(username=DOCKER_USER, password=DOCKER_SECRET)
-	#
-	# 	for line in client.images.push(repository=build_repo, tag=build_tag, stream=True):
-	# 		logutils.process_docker_message(line)
-	# 	logging.info(f"Successfully pushed Docker image `{build_tag}` in `{build_repo}`.")
-	#
-	# 	docker.from_env().images.get(f"{build_repo}:{build_tag}").tag(f"{build_repo}:latest")
-	#
-	# 	for line in client.images.push(repository=build_repo, tag='latest', stream=True):
-	# 		logutils.process_docker_message(line)
-	# 	logging.info(f"Successfully pushed Docker image `latest` in `{build_repo}`.")
-	# 	wfutils.actions_write_output(name="test_status", value="cont")
-	# else:
-	# 	wfutils.actions_write_output(name="test_status", value="skip")
+	tag_status = image_tag_exists(
+		docker_client=client,
+		tag=build_tag,
+		repo=build_repo
+	)
+
+	if tag_status:
+		build_args = {
+			'DL_URL': build_url.download_url,
+			'DL_NAME': build_url.filename,
+			'DL_HASH': build_url.hash,
+			'EULA_DATE': dl_eula_date,
+		}
+
+		dockerfile_dir = os.path.join(os.path.dirname(__file__), "..", "hinstall")
+
+		logging.info("Building Docker image...")
+		image, logs = client.images.build(
+			path=os.path.abspath(dockerfile_dir),
+			rm=True,
+			nocache=True,
+			tag=f"{build_repo}:{build_tag}",
+			buildargs=build_args,
+			encoding="gzip",
+		)
+
+		logging.info(f"Built Docker image `{image.short_id}`, pushing to Docker hub...")
+		client.login(username=DOCKER_USER, password=DOCKER_SECRET)
+
+		for line in client.images.push(repository=build_repo, tag=build_tag, stream=True):
+			logutils.process_docker_message(line)
+		logging.info(f"Successfully pushed Docker image `{build_tag}` in `{build_repo}`.")
+
+		docker.from_env().images.get(f"{build_repo}:{build_tag}").tag(f"{build_repo}:latest")
+
+		for line in client.images.push(repository=build_repo, tag='latest', stream=True):
+			logutils.process_docker_message(line)
+		logging.info(f"Successfully pushed Docker image `latest` in `{build_repo}`.")
+		wfutils.actions_write_output(name="test_status", value="cont")
+	else:
+		wfutils.actions_write_output(name="test_status", value="skip")
 
 	logging.info("Finished HouDocker process, exiting...")
