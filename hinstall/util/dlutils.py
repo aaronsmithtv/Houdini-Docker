@@ -1,10 +1,13 @@
-import tarfile
-import os
-import pathlib
-import requests
 import hashlib
 import logging
+import os
+import pathlib
+import tarfile
+
+import requests
 from tqdm import tqdm
+
+logger = logging.getLogger(__name__)
 
 
 def extract_tar_gz_file(file_path: str) -> str:

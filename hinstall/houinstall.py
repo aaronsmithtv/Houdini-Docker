@@ -1,9 +1,9 @@
-import os
-import hinstall.util.dlutils as hio
 import logging
+import os
+
+import hinstall.util.dlutils as hdl
 
 logging.basicConfig(level=logging.INFO)
-
 
 if __name__ == '__main__':
 
@@ -13,8 +13,8 @@ if __name__ == '__main__':
         'hash': os.environ.get('SIDEFX_DL_HASH'),
     }
 
-    hio.download_hou_file(dl_request=srv_build)
+    hdl.download_hou_file(dl_request=srv_build)
 
-    hio.verify_hou_checksum(dl_request=srv_build)
+    hdl.verify_hou_checksum(dl_request=srv_build)
 
-    hio.extract_hou_tar(dl_request=srv_build)
+    hdl.extract_hou_tar(dl_request=srv_build)
