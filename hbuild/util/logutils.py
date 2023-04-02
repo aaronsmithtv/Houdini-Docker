@@ -1,6 +1,6 @@
 import json
-import sys
 import logging
+import sys
 
 
 def process_docker_message(raw_message) -> None:

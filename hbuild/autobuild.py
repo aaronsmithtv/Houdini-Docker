@@ -1,16 +1,14 @@
+import logging
+import os
+
 import docker
 from docker.errors import NotFound
 
-import os
-import logging
-
+import hbuild.sidefxapi.webapi as webapi
 import hbuild.util.logutils as logutils
 import hbuild.util.workflowutils as wfutils
-
-import hbuild.sidefxapi.webapi as webapi
-from hbuild.sidefxapi.model.service import \
-	ProductModel, BuildDownloadModel, ProductBuild, DailyBuild
-
+from hbuild.sidefxapi.model.service import (BuildDownloadModel, DailyBuild,
+                                            ProductBuild, ProductModel)
 
 logging.basicConfig(level=logging.INFO)
 

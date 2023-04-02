@@ -1,5 +1,6 @@
-from pydantic import BaseModel, AnyUrl
 from typing import Optional
+
+from pydantic import AnyUrl, BaseModel
 
 
 class ProductModel(BaseModel):

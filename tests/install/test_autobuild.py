@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock
+
 from docker.errors import NotFound
+
 import hbuild.autobuild as autobuild
 
 

@@ -1,6 +1,7 @@
-import hinstall.util.dlutils as hdl
 import logging
 import os
+
+import hinstall.util.dlutils as hdl
 
 logging.basicConfig(level=logging.INFO)
 
