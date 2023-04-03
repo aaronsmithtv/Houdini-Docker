@@ -3,18 +3,15 @@ import os
 
 import docker
 from docker.errors import NotFound
+from sesiweb import SesiWeb
+from sesiweb.model.service import BuildDownloadModel, DailyBuild, ProductBuild
 
-import hbuild.sidefxapi.webapi as webapi
 import hbuild.util.logutils as logutils
 import hbuild.util.workflowutils as wfutils
-from hbuild.sidefxapi.model.service import (BuildDownloadModel, DailyBuild,
-                                            ProductBuild, ProductModel)
 
 logging.basicConfig(level=logging.INFO)
 
-dl_eula_date = "2021-10-13"
-dl_product = 'houdini'
-dl_platform = 'linux'
+EULA_DATE = "2021-10-13"
 
 DOCKER_USER = os.environ.get('DOCKER_USER')
 DOCKER_SECRET = os.environ.get('DOCKER_SECRET')
@@ -40,23 +37,22 @@ def image_tag_exists(docker_client: docker.DockerClient, tag: str, repo: str) ->
     return True
 
 
-def get_latest_build() -> (BuildDownloadModel, DailyBuild):
+def get_latest_build(
+        sw_product: str = 'houdini',
+        sw_platform: str = 'linux') -> (BuildDownloadModel, DailyBuild):
     logging.info("Starting Houdini download client service")
 
-    sidefx_client = webapi.WebHoudini(
-        sesi_secret=SIDEFX_SECRET,
-        sesi_id=SIDEFX_CLIENT
+    sw = SesiWeb(
+        client_secret=SIDEFX_SECRET,
+        client_id=SIDEFX_CLIENT
     )
 
-    product_build = ProductModel(
-        product=dl_product,
-        platform=dl_platform
-    )
+    product_build = {'product': sw_product, 'platform': sw_platform}
 
-    build_select = sidefx_client.get_latest_builds(build=product_build)[0]
+    build_select = sw.get_latest_build(prodinfo=product_build)
 
-    build_dl = sidefx_client.get_build_download(
-        build=ProductBuild(**build_select.dict())
+    build_dl = sw.get_build_download(
+        prodinfo=ProductBuild(**build_select.dict())
     )
 
     return build_dl, build_select
@@ -81,7 +77,7 @@ if __name__ == "__main__":
             'DL_URL': build_url.download_url,
             'DL_NAME': build_url.filename,
             'DL_HASH': build_url.hash,
-            'EULA_DATE': dl_eula_date,
+            'EULA_DATE': EULA_DATE,
         }
 
         dockerfile_dir = os.path.join(os.path.dirname(__file__), "..", "hinstall")
