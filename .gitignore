@@ -71,3 +71,7 @@ Thumbs.db
 # Environment variables file for Docker
 .env
 /houdini/*
+*.pypirc
+*.egg-info
+.ruff*
+build
