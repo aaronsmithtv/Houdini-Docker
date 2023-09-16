@@ -66,7 +66,7 @@ We welcome contributions to the Houdini-Docker project! If you'd like to contrib
 3. Commit your changes.
 4. Submit a pull request.
 
-For any questions or discussions, please open an issue or contact the maintainers.
+For any questions or discussions, please open an issue or contact me whenever!
 
 ## License
 
