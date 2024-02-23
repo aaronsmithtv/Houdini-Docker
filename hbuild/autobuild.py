@@ -13,12 +13,12 @@ logging.basicConfig(level=logging.INFO)
 
 EULA_DATE = "2021-10-13"
 
-DOCKER_USER = os.environ.get('DOCKER_USER')
-DOCKER_SECRET = os.environ.get('DOCKER_SECRET')
-DOCKER_REPO = os.environ.get('DOCKER_REPO')
+DOCKER_USER = os.environ.get("DOCKER_USER")
+DOCKER_SECRET = os.environ.get("DOCKER_SECRET")
+DOCKER_REPO = os.environ.get("DOCKER_REPO")
 
-SIDEFX_CLIENT = os.environ.get('SIDEFX_CLIENT')
-SIDEFX_SECRET = os.environ.get('SIDEFX_SECRET')
+SIDEFX_CLIENT = os.environ.get("SIDEFX_CLIENT")
+SIDEFX_SECRET = os.environ.get("SIDEFX_SECRET")
 
 install_dir = "../hinstall"
 build_repo = f"{DOCKER_USER}/{DOCKER_REPO}"
@@ -38,22 +38,17 @@ def image_tag_exists(docker_client: docker.DockerClient, tag: str, repo: str) ->
 
 
 def get_latest_build(
-        sw_product: str = 'houdini',
-        sw_platform: str = 'linux') -> (BuildDownloadModel, DailyBuild):
+    sw_product: str = "houdini", sw_platform: str = "linux"
+) -> (BuildDownloadModel, DailyBuild):
     logging.info("Starting Houdini download client service")
 
-    sw = SesiWeb(
-        client_secret=SIDEFX_SECRET,
-        client_id=SIDEFX_CLIENT
-    )
+    sw = SesiWeb(client_secret=SIDEFX_SECRET, client_id=SIDEFX_CLIENT)
 
-    product_build = {'product': sw_product, 'platform': sw_platform}
+    product_build = {"product": sw_product, "platform": sw_platform}
 
     build_select = sw.get_latest_build(prodinfo=product_build)
 
-    build_dl = sw.get_build_download(
-        prodinfo=ProductBuild(**build_select.dict())
-    )
+    build_dl = sw.get_build_download(prodinfo=ProductBuild(**build_select.dict()))
 
     return build_dl, build_select
 
@@ -64,20 +59,16 @@ if __name__ == "__main__":
     build_url, build_meta = get_latest_build()
 
     build_tag = f"{build_meta.version}.{build_meta.build}-base"
-    logging.info(f'Latest build found: `{build_tag}`')
+    logging.info(f"Latest build found: `{build_tag}`")
 
-    tag_status = image_tag_exists(
-        docker_client=client,
-        tag=build_tag,
-        repo=build_repo
-    )
+    tag_status = image_tag_exists(docker_client=client, tag=build_tag, repo=build_repo)
 
     if tag_status:
         build_args = {
-            'DL_URL': build_url.download_url,
-            'DL_NAME': build_url.filename,
-            'DL_HASH': build_url.hash,
-            'EULA_DATE': EULA_DATE,
+            "DL_URL": build_url.download_url,
+            "DL_NAME": build_url.filename,
+            "DL_HASH": build_url.hash,
+            "EULA_DATE": EULA_DATE,
         }
 
         dockerfile_dir = os.path.join(os.path.dirname(__file__), "..", "hinstall")
@@ -96,14 +87,18 @@ if __name__ == "__main__":
         client.login(username=DOCKER_USER, password=DOCKER_SECRET)
 
         for line in client.images.push(
-                repository=build_repo, tag=build_tag, stream=True):
+            repository=build_repo, tag=build_tag, stream=True
+        ):
             logutils.process_docker_message(line)
         logging.info(f"Pushed Docker image `{build_tag}` in `{build_repo}`.")
 
-        docker.from_env().images.get(f"{build_repo}:{build_tag}").tag(f"{build_repo}:latest")
+        docker.from_env().images.get(f"{build_repo}:{build_tag}").tag(
+            f"{build_repo}:latest"
+        )
 
         for line in client.images.push(
-                repository=build_repo, tag='latest', stream=True):
+            repository=build_repo, tag="latest", stream=True
+        ):
             logutils.process_docker_message(line)
         logging.info(f"Pushed Docker image `latest` in `{build_repo}`.")
         wfutils.actions_write_output(name="test_status", value="cont")
