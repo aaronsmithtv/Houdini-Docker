@@ -1,13 +1,14 @@
-import pytest
-import docker
 import os
 
-SIDEFX_CLIENT = os.environ.get('SIDEFX_CLIENT')
-SIDEFX_SECRET = os.environ.get('SIDEFX_SECRET')
+import docker
+import pytest
 
-DOCKER_USER = os.environ.get('DOCKER_USER')
-DOCKER_SECRET = os.environ.get('DOCKER_SECRET')
-DOCKER_REPO = os.environ.get('DOCKER_REPO')
+SIDEFX_CLIENT = os.environ.get("SIDEFX_CLIENT")
+SIDEFX_SECRET = os.environ.get("SIDEFX_SECRET")
+
+DOCKER_USER = os.environ.get("DOCKER_USER")
+DOCKER_SECRET = os.environ.get("DOCKER_SECRET")
+DOCKER_REPO = os.environ.get("DOCKER_REPO")
 
 build_repo = f"{DOCKER_USER}/{DOCKER_REPO}"
 build_tag = "latest"
@@ -34,13 +35,10 @@ def test_hython_environment(docker_client):
     log = docker_client.containers.run(
         image=f"{build_repo}:{build_tag}",
         command=command,
-        environment={
-            "SIDEFX_CLIENT": SIDEFX_CLIENT,
-            "SIDEFX_SECRET": SIDEFX_SECRET
-        }
+        environment={"SIDEFX_CLIENT": SIDEFX_CLIENT, "SIDEFX_SECRET": SIDEFX_SECRET},
     )
 
-    log_output = log.decode('utf-8')
+    log_output = log.decode("utf-8")
     # print(log_output)
 
     assert success_message in log_output
