@@ -14,7 +14,7 @@ ENV PYTHONPATH=/code
 RUN mkdir /houdini
 RUN python3 hinstall/houinstall.py
 
-# SECOND STAGE: Install and initialize Houdini
+# SECOND STAGE: Install Houdini
 FROM debian:12-slim as houdini-install
 
 # Update and install required packages
@@ -33,14 +33,14 @@ RUN apt-get update && \
     libnss3 libpci3 libasound2 \
     bc wget \
     libqt5core5a libqt5gui5 libqt5widgets5 libqt5x11extras5 \
-    libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 \
-    libxcb-xinerama0 \
     x11-utils x11-xserver-utils \
     libgl1-mesa-dev libglu1-mesa-dev \
     libgomp1 libglvnd0 \
-    xvfb && \
+    xvfb \
+    ca-certificates && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    update-ca-certificates
 
 COPY --from=houdini-downloader /houdini /houdiniInstaller
 # Please update the following EULA_DATE to match the latest updated
@@ -51,30 +51,28 @@ ARG EULA_DATE="2021-10-13"
 RUN yes | /houdiniInstaller/build/houdini.install --auto-install --accept-EULA ${EULA_DATE} --make-dir /opt/houdini/build
 RUN rm -r /houdiniInstaller
 
-# THIRD STAGE: Copy houdini-install image and un-cache unnecessary installation files
+# THIRD STAGE: Final image
 FROM debian:12-slim
 COPY --from=houdini-install / /
 
-RUN apt-get update && apt-get install -y ca-certificates
-RUN update-ca-certificates
-
 # OpenCL installation
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ocl-icd-libopencl1 \
-    ocl-icd-opencl-dev \
-    clinfo \
-    mesa-opencl-icd \
-    pocl-opencl-icd \
-    opencl-headers \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p /etc/OpenCL/vendors && \
-    echo "libpocl.so" > /etc/OpenCL/vendors/pocl.icd
+    ocl-icd-libopencl1 ocl-icd-opencl-dev clinfo mesa-opencl-icd pocl-opencl-icd opencl-headers \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /etc/OpenCL/vendors && echo "libpocl.so" > /etc/OpenCL/vendors/pocl.icd \
 
 RUN clinfo
-ENV OCL_ICD_VENDORS="/etc/OpenCL/vendors"
 
-# Final environment assignments
-ENV PATH="${PATH}:/opt/houdini/build/houdini/sbin:/opt/houdini/build/bin"
-ENV HOUDINI_OCL_DEVICETYPE="CPU"
+ARG OCL_VENDOR=POCL
+ARG OCL_DEVICE_NUMBER=0
+ARG OCL_DEVICE_TYPE=CPU
+
+# OpenCL env variables for Houdini
+ENV PATH="${PATH}:/opt/houdini/build/houdini/sbin:/opt/houdini/build/bin" \
+    HOUDINI_OCL_VENDOR=${OCL_VENDOR} \
+    HOUDINI_OCL_DEVICENUMBER=${OCL_DEVICE_NUMBER} \
+    HOUDINI_OCL_DEVICETYPE=${OCL_DEVICE_TYPE} \
+    OCL_ICD_VENDORS="/etc/OpenCL/vendors"
+
+# Xvfb headless operation env variables
 ENV DISPLAY=:99
