@@ -32,8 +32,9 @@ Once you have started the Docker container using Hbuild, you can quickly get sta
 You can optionally allow these services to access to your [*SideFX API credentials*](https://www.sidefx.com/oauth2/applications/).
 
 ```shell
-hserver -C -S https://www.sidefx.com/license/sesinetd --clientid $SIDEFX_CLIENT --clientsecret $SIDEFX_SECRET
-sesictrl ping --client-id $SIDEFX_CLIENT --client-secret $SIDEFX_SECRET
+hserver --clientid $SIDEFX_CLIENT --clientsecret $SIDEFX_SECRET --host "https://www.sidefx.com/license/sesinetd"
+sesictrl login
+sesictrl ping
 ```
 
 If the request is successful, you should eventually see a response indicating the length of time taken to get a response from the license server (Hserver may initially need to restart itself in order to update the credentials).
