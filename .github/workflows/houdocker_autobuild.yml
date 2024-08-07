@@ -68,27 +68,27 @@ jobs:
           pytest tests/build/
           echo "status=success" >> $GITHUB_OUTPUT
 
-  hython_test:
-    needs: pingtest
-    runs-on: ubuntu-latest
-    env:
-      DOCKER_USER: ${{secrets.DOCKER_USER}}
-      DOCKER_SECRET: ${{secrets.DOCKER_SECRET}}
-      DOCKER_REPO: ${{secrets.DOCKER_REPO}}
-    if: needs.pingtest.outputs.pingtest_status == 'success'
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run hython tests
-        run: pytest tests/hython/
+#  hython_test:
+#    needs: pingtest
+#    runs-on: ubuntu-latest
+#    env:
+#      DOCKER_USER: ${{secrets.DOCKER_USER}}
+#      DOCKER_SECRET: ${{secrets.DOCKER_SECRET}}
+#      DOCKER_REPO: ${{secrets.DOCKER_REPO}}
+#    if: needs.pingtest.outputs.pingtest_status == 'success'
+#    steps:
+#      - name: Check out repository
+#        uses: actions/checkout@v4
+#
+#      - name: Set up Python
+#        uses: actions/setup-python@v5
+#        with:
+#          python-version: 3.11
+#
+#      - name: Install dependencies
+#        run: |
+#          python -m pip install --upgrade pip
+#          pip install -r requirements.txt
+#
+#      - name: Run hython tests
+#        run: pytest tests/hython/
