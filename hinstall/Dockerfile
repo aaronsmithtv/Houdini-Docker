@@ -55,24 +55,11 @@ RUN rm -r /houdiniInstaller
 FROM debian:12-slim
 COPY --from=houdini-install / /
 
-# OpenCL installation
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ocl-icd-libopencl1 ocl-icd-opencl-dev clinfo mesa-opencl-icd pocl-opencl-icd opencl-headers \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /etc/OpenCL/vendors && echo "libpocl.so" > /etc/OpenCL/vendors/pocl.icd \
+# Add houdini bins to path env variable
+ENV PATH="${PATH}:/opt/houdini/build/houdini/sbin:/opt/houdini/build/bin"
 
-RUN clinfo
-
-ARG OCL_VENDOR=POCL
-ARG OCL_DEVICE_NUMBER=0
-ARG OCL_DEVICE_TYPE=CPU
-
-# OpenCL env variables for Houdini
-ENV PATH="${PATH}:/opt/houdini/build/houdini/sbin:/opt/houdini/build/bin" \
-    HOUDINI_OCL_VENDOR=${OCL_VENDOR} \
-    HOUDINI_OCL_DEVICENUMBER=${OCL_DEVICE_NUMBER} \
-    HOUDINI_OCL_DEVICETYPE=${OCL_DEVICE_TYPE} \
-    OCL_ICD_VENDORS="/etc/OpenCL/vendors"
+ENV HOUDINI_OCL_DEVICENUMBER=0
+ENV HOUDINI_OCL_DEVICETYPE=CPU
 
 # Xvfb headless operation env variables
 ENV DISPLAY=:99
