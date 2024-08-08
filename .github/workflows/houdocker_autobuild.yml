@@ -72,6 +72,8 @@ jobs:
 #    needs: pingtest
 #    runs-on: ubuntu-latest
 #    env:
+#      SIDEFX_CLIENT: ${{secrets.SIDEFX_CLIENT}}
+#      SIDEFX_SECRET: ${{secrets.SIDEFX_SECRET}}
 #      DOCKER_USER: ${{secrets.DOCKER_USER}}
 #      DOCKER_SECRET: ${{secrets.DOCKER_SECRET}}
 #      DOCKER_REPO: ${{secrets.DOCKER_REPO}}
@@ -91,4 +93,8 @@ jobs:
 #          pip install -r requirements.txt
 #
 #      - name: Run hython tests
-#        run: pytest tests/hython/
+#        uses: nick-fields/retry@v2
+#        with:
+#          timeout_minutes: 10
+#          max_attempts: 3
+#          command: pytest tests/hython/
