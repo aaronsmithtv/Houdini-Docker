@@ -23,7 +23,7 @@ def test_hython_environment():
 
     success_message = "hython success"
 
-    command = f"/bin/sh -c \"hserver --clientid \"{SIDEFX_CLIENT}\" --clientsecret \"{SIDEFX_SECRET}\" --host \"https://www.sidefx.com/license/sesinetd\"; sleep 5; sesictrl login; sleep 5; echo \'print(\\\"{success_message}\\\")\' > test.py && hython test.py\""
+    command = f'/bin/sh -c "hserver --clientid "{SIDEFX_CLIENT}" --clientsecret "{SIDEFX_SECRET}" --host "https://www.sidefx.com/license/sesinetd"; sleep 5; sesictrl login; sleep 5; echo \'print(\\"{success_message}\\")\' > test.py && hython test.py"'
 
     log = client.containers.run(
         image=f"{build_repo}:{build_tag}",
