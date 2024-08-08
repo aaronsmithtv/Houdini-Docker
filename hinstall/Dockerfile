@@ -58,8 +58,12 @@ COPY --from=houdini-install / /
 # Add houdini bins to path env variable
 ENV PATH="${PATH}:/opt/houdini/build/houdini/sbin:/opt/houdini/build/bin"
 
-ENV HOUDINI_OCL_DEVICENUMBER=0
-ENV HOUDINI_OCL_DEVICETYPE=CPU
+# POCL installation (OpenCL 1.2)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ocl-icd-libopencl1 ocl-icd-opencl-dev pocl-opencl-icd opencl-headers clinfo \
+    libhwloc-dev libtinfo5 libpocl2 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Xvfb headless operation env variables
-ENV DISPLAY=:99
+RUN mkdir -p /etc/OpenCL/vendors && echo "libpocl.so" > /etc/OpenCL/vendors/pocl.icd

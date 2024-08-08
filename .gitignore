@@ -74,4 +74,3 @@ Thumbs.db
 *.pypirc
 *.egg-info
 .ruff*
-build
