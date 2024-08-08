@@ -58,7 +58,7 @@ COPY --from=houdini-install / /
 # Add houdini bins to path env variable
 ENV PATH="${PATH}:/opt/houdini/build/houdini/sbin:/opt/houdini/build/bin"
 
-# OpenCL installation
+# POCL installation (OpenCL 1.2)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ocl-icd-libopencl1 ocl-icd-opencl-dev pocl-opencl-icd opencl-headers clinfo \
