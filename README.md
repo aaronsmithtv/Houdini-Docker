@@ -25,8 +25,8 @@ Whether you're new to Python, Docker, or Houdini, this README aims to provide yo
 
 - [Using Hbuild Images](#using-hbuild-images)
 - [Features](#features)
-- [Contributing](#contributing)
 - [License](#license)
+- [Thank You](#thank-you)
 
 ## Using Hbuild Images
 
@@ -37,11 +37,11 @@ If you want to get started quickly with using Houdini-Docker images, follow thes
 2. Open a terminal (Command Prompt, PowerShell, or Terminal, depending on your operating system).
 
 3. Pull the most recently generated Houdini image by running the following command:
-    ```shell
+    ```cmd
     docker pull aaronsmithtv/hbuild:latest
     ```
 4. To create and run a container from the pulled image, execute the following command:
-    ```shell
+    ```cmd
     docker run -it --name houdini-container --rm aaronsmithtv/hbuild:latest
     ```
 
@@ -50,17 +50,17 @@ If you want to get started quickly with using Houdini-Docker images, follow thes
    Using the `hserver` command, you can use your [SideFX API credentials](https://www.sidefx.com/oauth2/applications/) to bypass a manual login, enabling automated license server connections directly to the online licensing platform. (*authorization-code* credentials only)
 
    Keep in mind that your `--host` argument should point to whatever license server you currently use. If you are unsure, check the *Server Name* column in the *Server Information* tab of your Houdini License Administrator.
-   ```shell
+   ```cmd
    hserver --clientid "..." --clientsecret "..." --host "https://www.sidefx.com/license/sesinetd"
    ```
 
 6. After the `hserver` daemon is initialized, you can use `sesictrl`, the command line license server utility to log in. A username and password isn't needed as your API credentials should now replace this in Houdini 20.5. A successful login displays a short message.
-    ```shell
+    ```cmd
     >>> sesictrl login
    You are logged in with aaronsmithtv (account: 51443, company: aaronsmith.tv)
     ```
 7. Now that your license server is set up, you should be able to use processes like *Hython* in the interactive Docker image command line, which allows you to operate a Houdini scene through Python through the [Houdini Object Model (HOM)](https://www.sidefx.com/docs/houdini/hom/intro.html).
-   ```shell
+   ```cmd
    >>> hython
    Python 3.11.7 (main, Feb 22 2024, 17:25:45) [GCC 9.3.1 20200408 (Red Hat 9.3.1-2)] on linux
    Houdini 20.5.278 hou module imported.
