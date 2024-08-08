@@ -74,6 +74,8 @@ For an example process on how to launch a test `hserver` instance (to verify you
 ## Features
 
 - Automatically checks for the latest Houdini production build every day at midnight.
+- Pytest workflows check that the online SideFX license server `sesinetd` can be reached from within a container
+- Additional workflow dependencies check that the Hbuild Docker image is functional by running Hython test processes.
 - Builds a Docker image with the latest Houdini build.
 - Pushes the new image to Docker Hub with the build tag and as the latest image.
 
