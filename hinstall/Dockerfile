@@ -69,13 +69,18 @@ RUN yes | /houdiniInstaller/build/houdini.install --auto-install --accept-EULA $
 FROM debian:12-slim
 COPY --from=houdini-install / /
 
-# Add houdini bins to path env variable
-ENV PATH="${PATH}:/opt/houdini/build/houdini/sbin:/opt/houdini/build/bin"
+# Install ca-certificates first
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    update-ca-certificates
 
-# POCL installation (OpenCL 1.2)
+# OpenCL installation
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ocl-icd-libopencl1 ocl-icd-opencl-dev pocl-opencl-icd opencl-headers clinfo \
+    mesa-opencl-icd \
     libhwloc-dev libtinfo5 libpocl2 && \
     # Clean up after install
     apt-get clean && \
@@ -85,3 +90,19 @@ RUN apt-get update && \
     # Create OpenCL vendor configuration
     mkdir -p /etc/OpenCL/vendors && \
     echo "libpocl.so" > /etc/OpenCL/vendors/pocl.icd
+
+# Verify OpenCL installation
+RUN clinfo || true
+
+# OpenCL build arguments for configuration
+ARG OCL_VENDOR=POCL
+ARG OCL_DEVICE_NUMBER=0
+ARG OCL_DEVICE_TYPE=CPU
+
+# Environment variables for Houdini and OpenCL
+ENV PATH="${PATH}:/opt/houdini/build/houdini/sbin:/opt/houdini/build/bin" \
+    HOUDINI_OCL_VENDOR=${OCL_VENDOR} \
+    HOUDINI_OCL_DEVICENUMBER=${OCL_DEVICE_NUMBER} \
+    HOUDINI_OCL_DEVICETYPE=${OCL_DEVICE_TYPE} \
+    OCL_ICD_VENDORS="/etc/OpenCL/vendors" \
+    DISPLAY=:99
