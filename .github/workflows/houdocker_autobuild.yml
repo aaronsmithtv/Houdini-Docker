@@ -16,7 +16,26 @@ jobs:
       DOCKER_REPO: ${{secrets.DOCKER_REPO}}
     steps:
       - name: Create additional disk space
-        run: sudo rm -rf /usr/share/dotnet && sudo rm -rf /opt/ghc && sudo rm -rf "/usr/local/share/boost" && sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        run: |
+          sudo rm -rf /opt/hostedtoolcache || true
+          sudo rm -rf /opt/microsoft || true
+          sudo rm -rf /opt/az || true
+          sudo rm -rf /opt/pipx || true
+          sudo rm -rf /opt/google || true
+
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /usr/local/share/powershell || true
+          sudo rm -rf /usr/local/share/boost || true
+          sudo rm -rf /usr/local/.ghcup || true
+
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /usr/share/swift || true
+
+          sudo apt-get clean
+          sudo apt-get autoremove -y
+          docker system prune -af --volumes
+
+          df -h
 
       - name: Check out repository
         uses: actions/checkout@v4
