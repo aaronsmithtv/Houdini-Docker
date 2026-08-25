@@ -38,18 +38,18 @@ def image_tag_exists(docker_client: docker.DockerClient, tag: str, repo: str) ->
 
 
 def get_latest_build(
-    sw_product: str = "houdini", sw_platform: str = "linux"
+        sw_product: str = "houdini", sw_platform: str = "linux", sw_arch: str = "x86_64"
 ) -> (BuildDownloadModel, DailyBuild):
-    logging.info("Starting Houdini download client service")
-
     sw = SesiWeb(client_secret=SIDEFX_SECRET, client_id=SIDEFX_CLIENT)
 
-    product_build = {"product": sw_product, "platform": sw_platform}
+    builds = sw.get_latest_builds(prodinfo={"product": sw_product, "platform": sw_platform})
+    builds = [b for b in builds if sw_arch in b.platform]
+    if not builds:
+        raise RuntimeError(f"No {sw_arch} builds found for {sw_product}/{sw_platform}")
 
-    build_select = sw.get_latest_build(prodinfo=product_build)
-
+    build_select = builds[0]
+    logging.info(f"Selected platform: `{build_select.platform}`")
     build_dl = sw.get_build_download(prodinfo=ProductBuild(**build_select.dict()))
-
     return build_dl, build_select
 
 
@@ -87,7 +87,7 @@ if __name__ == "__main__":
         client.login(username=DOCKER_USER, password=DOCKER_SECRET)
 
         for line in client.images.push(
-            repository=build_repo, tag=build_tag, stream=True
+                repository=build_repo, tag=build_tag, stream=True
         ):
             logutils.process_docker_message(line)
         logging.info(f"Pushed Docker image `{build_tag}` in `{build_repo}`.")
@@ -97,7 +97,7 @@ if __name__ == "__main__":
         )
 
         for line in client.images.push(
-            repository=build_repo, tag="latest", stream=True
+                repository=build_repo, tag="latest", stream=True
         ):
             logutils.process_docker_message(line)
         logging.info(f"Pushed Docker image `latest` in `{build_repo}`.")
